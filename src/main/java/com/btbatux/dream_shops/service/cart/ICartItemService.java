@@ -1,5 +1,7 @@
 package com.btbatux.dream_shops.service.cart;
 
+import com.btbatux.dream_shops.model.CartItem;
+
 public interface ICartItemService {
 
 
@@ -9,5 +11,5 @@ public interface ICartItemService {
 
     void updateItemQuantity(Long cartId, Long productId, int quantity);
 
-
+    CartItem getCartItem(Long cartId, Long productId);
 }

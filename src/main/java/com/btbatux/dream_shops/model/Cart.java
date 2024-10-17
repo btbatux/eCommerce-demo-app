@@ -22,6 +22,7 @@ public class Cart {
 
     private BigDecimal totalAmount = BigDecimal.ZERO; //sepetin toplam tutarı
 
+
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
     private Set<CartItem> cartItems; //sepetteki itemlar
 
@@ -37,20 +38,32 @@ public class Cart {
 
 
     public void removeItem(CartItem item) {
+        // 1. Verilen CartItem'ı sepetten (cartItems) kaldır.
         this.cartItems.remove(item);
+
+        // 2. Kaldırılan CartItem ile sepet arasındaki ilişkiyi kopar (CartItem'ın sepetini null yap).
         item.setCart(null);
+
+        // 3. Sepetin toplam tutarını güncelle.
         updateTotalAmount();
     }
 
 
-    private void updateTotalAmount() {
-        this.totalAmount = cartItems.stream().map(item -> {
-            BigDecimal unitPrice = item.getUnitPrice();
-            if (unitPrice == null) {
-                return BigDecimal.ZERO;
-            }
-            return unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
 
-        }).reduce(BigDecimal.ZERO, BigDecimal::add);
+    private void updateTotalAmount() {
+        // Sepetteki tüm CartItem'ların toplam tutarını hesapla.
+        this.totalAmount = cartItems.stream().map(item -> {
+                    // Eğer birim fiyat null ise, BigDecimal.ZERO döndür.
+                    BigDecimal unitPrice = item.getUnitPrice();
+                    if (unitPrice == null) {
+                        return BigDecimal.ZERO;
+                    }
+
+                    // Birim fiyat ile miktarı çarp ve o item'in toplam fiyatını hesapla.
+                    return unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
+                })
+                // Her bir CartItem'ın fiyatını topla ve toplam tutarı (totalAmount) elde et.
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
 }

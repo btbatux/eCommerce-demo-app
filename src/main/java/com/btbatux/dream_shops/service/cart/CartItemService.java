@@ -1,5 +1,6 @@
 package com.btbatux.dream_shops.service.cart;
 
+import com.btbatux.dream_shops.exception.ResourceNotFoundException;
 import com.btbatux.dream_shops.model.Cart;
 import com.btbatux.dream_shops.model.CartItem;
 import com.btbatux.dream_shops.model.Product;
@@ -7,6 +8,8 @@ import com.btbatux.dream_shops.repository.CartItemRepository;
 import com.btbatux.dream_shops.repository.CartRepository;
 import com.btbatux.dream_shops.service.product.IProductService;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class CartItemService implements ICartItemService {
@@ -38,8 +41,10 @@ public class CartItemService implements ICartItemService {
 
         // 3. Sepette aynı üründen daha önce eklenmiş mi kontrol et:
         // Eğer ürün zaten sepette varsa (CartItem) o ürünü alır, yoksa yeni bir CartItem oluşturur.
-        CartItem cartItem = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getId().equals(product.getId()))  // Sepette aynı ürünü arar.
+        CartItem cartItem = cart.
+                getCartItems().stream()
+                .filter(item ->
+                        item.getProduct().getId().equals(product.getId()))  // Sepette aynı ürünü arar.
                 .findFirst()
                 .orElse(new CartItem()); // Eğer ürün bulunamazsa yeni bir CartItem oluşturur.
 
@@ -54,29 +59,70 @@ public class CartItemService implements ICartItemService {
             // Eğer ürün daha önce sepete eklenmişse, miktarı artır.
             cartItem.setQuantity(cartItem.getQuantity() + quantity); // Mevcut miktara yeni miktarı ekler.
         }
-
         // 5. Toplam fiyatı hesapla ve set et (birim fiyat * miktar).
         cartItem.setTotalPrice();
-
         // 6. Sepete (Cart) bu CartItem'ı ekle.
         cart.addItem(cartItem);
-
         // 7. CartItem ve Cart veritabanına kaydedilir.
         cartItemRepository.save(cartItem); // CartItem kaydedilir.
         cartRepository.save(cart); // Sepet (Cart) kaydedilir.
     }
 
 
-
     @Override
     public void removeItemFromCart(Long cartId, Long productId) {
+        //Sepeti al: Verilen cartId'ye göre mevcut sepeti (Cart) getirir.
+        Cart cart = cartService.getCart(cartId);
+        //Sepette belirtilen productId'ye sahip ürünün olup olmadığını kontrol et ve bul:
+        //Sepette (CartItem) bu productId ile eşleşen ürünü bulur.
 
+        CartItem itemRemove = getCartItem(cartId, productId);
+        //Sepetten ürünü çıkar: Bulunan CartItem'ı sepetten çıkarır.
+        cart.removeItem(itemRemove);
+        //Güncellenen sepeti kaydet: Sepeti veritabanına kaydeder.
+        cartRepository.save(cart);
     }
-
 
 
     @Override
     public void updateItemQuantity(Long cartId, Long productId, int quantity) {
+        // 1. Verilen sepet ID'sine göre sepeti al.
+        Cart cart = cartService.getCart(cartId);
 
+        // 2. Sepetteki ürünleri (cartItems) dolaş ve verilen ürün ID'sine (productId) sahip olanı bul.
+        cart.getCartItems()
+                .stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .ifPresent(item -> {
+                    // 3. Eğer ürün bulunduysa, bu ürünün miktarını (quantity) güncelle.
+                    item.setQuantity(quantity);
+                    // 4. Ürünün birim fiyatını güncelle (eğer fiyat değişmişse).
+                    item.setUnitPrice(item.getProduct().getPrice());
+                    // 5. Yeni miktara göre toplam fiyatı güncelle.
+                    item.setTotalPrice();
+                });
+        // 6. Sepetteki tüm ürünlerin toplam fiyatını hesapla (totalAmount).
+        BigDecimal totalAmount = cart.getCartItems()
+                .stream()
+                .map(CartItem::getTotalPrice)  // Her CartItem için toplam fiyatı al
+                .reduce(BigDecimal.ZERO, BigDecimal::add);  // Toplamları birleştir
+        // 7. Sepetin toplam tutarını (totalAmount) güncelle.
+        cart.setTotalAmount(totalAmount);
+        // 8. Sepeti veritabanına kaydet.
+        cartRepository.save(cart);
     }
+
+    @Override
+    public CartItem getCartItem(Long cartId,
+                                Long productId) {
+        Cart cart = cartService.getCart(cartId);
+        return cart.getCartItems().stream().filter(item ->
+                        item.getProduct().
+                        getId().equals(productId)).
+                findFirst().
+                orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found"));
+    }
+
 }
