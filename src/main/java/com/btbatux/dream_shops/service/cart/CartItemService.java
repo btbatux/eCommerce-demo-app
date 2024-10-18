@@ -7,6 +7,7 @@ import com.btbatux.dream_shops.model.Product;
 import com.btbatux.dream_shops.repository.CartItemRepository;
 import com.btbatux.dream_shops.repository.CartRepository;
 import com.btbatux.dream_shops.service.product.IProductService;
+import com.btbatux.dream_shops.service.product.ProductService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,18 +17,17 @@ public class CartItemService implements ICartItemService {
 
     private final CartItemRepository cartItemRepository;
     private final ICartService cartService;
-    private final IProductService iProductService;
+    private final ProductService productService;
     private final CartRepository cartRepository;
 
     public CartItemService(CartItemRepository cartItemRepository,
                            CartService cartService,
-                           IProductService iProductService,
+                           ProductService productService,
                            CartRepository cartRepository) {
         this.cartItemRepository = cartItemRepository;
+        this.productService = productService;
         this.cartRepository = cartRepository;
         this.cartService = cartService;
-        this.iProductService = iProductService;
-
     }
 
 
@@ -37,7 +37,7 @@ public class CartItemService implements ICartItemService {
         Cart cart = cartService.getCart(cartId);
 
         // 2. Ürünü al: Verilen productId'ye göre mevcut ürünü (Product) getirir.
-        Product product = iProductService.getProductById(productId);
+        Product product = productService.getProductById(productId);
 
         // 3. Sepette aynı üründen daha önce eklenmiş mi kontrol et:
         // Eğer ürün zaten sepette varsa (CartItem) o ürünü alır, yoksa yeni bir CartItem oluşturur.
@@ -119,7 +119,7 @@ public class CartItemService implements ICartItemService {
         Cart cart = cartService.getCart(cartId);
         return cart.getCartItems().stream().filter(item ->
                         item.getProduct().
-                        getId().equals(productId)).
+                                getId().equals(productId)).
                 findFirst().
                 orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));

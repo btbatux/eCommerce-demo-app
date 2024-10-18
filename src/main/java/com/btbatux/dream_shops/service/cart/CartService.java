@@ -36,7 +36,6 @@ public class CartService implements ICartService {
 
     @Override
     public void clearCart(Long id) {
-
         Cart cart = getCart(id);
 
         cartItemRepository.deleteAllByCartId(id);
