@@ -2,18 +2,19 @@ package com.btbatux.dream_shops.service.cart;
 
 import com.btbatux.dream_shops.exception.ResourceNotFoundException;
 import com.btbatux.dream_shops.model.Cart;
-import com.btbatux.dream_shops.model.CartItem;
 import com.btbatux.dream_shops.repository.CartItemRepository;
 import com.btbatux.dream_shops.repository.CartRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class CartService implements ICartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final AtomicLong cartIdGenerator = new AtomicLong(0);
 
     public CartService(CartRepository cartRepository,
                        CartItemRepository cartItemRepository) {
@@ -48,5 +49,14 @@ public class CartService implements ICartService {
     public BigDecimal getTotalPrice(Long id) {
         Cart cart = getCart(id);
         return cart.getTotalAmount();
+    }
+
+
+    @Override
+    public Long initializeNewCart() {
+        Cart cart = new Cart();
+        Long newCartId = cartIdGenerator.incrementAndGet();
+        cart.setId(newCartId);
+        return cartRepository.save(cart).getId();
     }
 }

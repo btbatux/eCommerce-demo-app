@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -24,9 +25,7 @@ public class Cart {
 
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    private Set<CartItem> cartItems; //sepetteki itemlar
-
-
+    private Set<CartItem> cartItems = new HashSet<>();  // Boş Set olarak başlatıldı
 
 
 
