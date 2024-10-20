@@ -24,7 +24,7 @@ public class CartItem {
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "card_id")
+    @JoinColumn(name = "cart_id")
     private Cart cart; //Sepette birden fazla ürün olabilir
 
     @ManyToOne

@@ -23,10 +23,8 @@ public class Cart {
 
     private BigDecimal totalAmount = BigDecimal.ZERO; //sepetin toplam tutarı
 
-
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> cartItems = new HashSet<>();  // Boş Set olarak başlatıldı
-
 
 
     public void addItem(CartItem item) {
@@ -46,7 +44,6 @@ public class Cart {
         // 3. Sepetin toplam tutarını güncelle.
         updateTotalAmount();
     }
-
 
 
     private void updateTotalAmount() {
