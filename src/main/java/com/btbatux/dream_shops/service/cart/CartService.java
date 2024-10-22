@@ -1,10 +1,10 @@
 package com.btbatux.dream_shops.service.cart;
-
 import com.btbatux.dream_shops.exception.ResourceNotFoundException;
 import com.btbatux.dream_shops.model.Cart;
 import com.btbatux.dream_shops.repository.CartItemRepository;
 import com.btbatux.dream_shops.repository.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,18 +31,22 @@ public class CartService implements ICartService {
         BigDecimal totalAmount = cart.getTotalAmount();
         cart.setTotalAmount(totalAmount);
         return cartRepository.save(cart);
-
     }
 
 
+    /*
+    metodun içindeki işlemlerin bir bütün olarak ele alınmasını sağlar
+    ya hepsi başarılı olur ya da hiçbiri uygulanmaz
+    */
+    @Transactional
     @Override
     public void clearCart(Long id) {
         Cart cart = getCart(id);
-
         cartItemRepository.deleteAllByCartId(id);
         cart.getCartItems().clear();
         cartRepository.deleteById(id);
     }
+
 
 
     @Override
@@ -50,6 +54,7 @@ public class CartService implements ICartService {
         Cart cart = getCart(id);
         return cart.getTotalAmount();
     }
+
 
 
     @Override
