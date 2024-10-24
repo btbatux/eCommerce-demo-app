@@ -29,18 +29,19 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(Long userId) {
-        User user = getUserById(userId);
-        userRepository.delete(user);
+            User user = getUserById(userId);
+            userRepository.delete(user);
     }
 
 
     @Override
     public User updateUser(UpdateUserRequest updateUserRequest, Long userId) {
-        return userRepository.findById(userId).map(existingUser -> {
+        return userRepository
+                .findById(userId)
+                .map(existingUser -> {
             existingUser.setFirstName(updateUserRequest.getFirstName());
             existingUser.setLastName(updateUserRequest.getLastName());
             return userRepository.save(existingUser);
-
         }).orElseThrow(() ->
                 new ResourceNotFoundException("User not found! " + userId));
 
