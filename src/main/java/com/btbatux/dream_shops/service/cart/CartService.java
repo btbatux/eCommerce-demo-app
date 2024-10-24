@@ -1,4 +1,5 @@
 package com.btbatux.dream_shops.service.cart;
+
 import com.btbatux.dream_shops.exception.ResourceNotFoundException;
 import com.btbatux.dream_shops.model.Cart;
 import com.btbatux.dream_shops.repository.CartItemRepository;
@@ -48,13 +49,11 @@ public class CartService implements ICartService {
     }
 
 
-
     @Override
     public BigDecimal getTotalPrice(Long id) {
         Cart cart = getCart(id);
         return cart.getTotalAmount();
     }
-
 
 
     @Override
@@ -63,5 +62,11 @@ public class CartService implements ICartService {
         Long newCartId = cartIdGenerator.incrementAndGet();
         cart.setId(newCartId);
         return cartRepository.save(cart).getId();
+    }
+
+
+    @Override
+    public Cart getCartByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
     }
 }
