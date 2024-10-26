@@ -25,19 +25,22 @@ public class ProductService implements IProductService {
     private final ModelMapper modelMapper;
     private final ImageRepository imageRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ModelMapper modelMapper, ImageRepository imageRepository) {
+    public ProductService(ProductRepository productRepository,
+                          CategoryRepository categoryRepository,
+                          ModelMapper modelMapper,
+                          ImageRepository imageRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-
-        this.modelMapper = modelMapper;
         this.imageRepository = imageRepository;
+        this.modelMapper = modelMapper;
     }
 
 
     @Override
     public Product addProduct(AddProductRequest addProductRequest) {
         try {
-            Category category = Optional.ofNullable(categoryRepository.findByName(addProductRequest.getCategory().getName()))
+            Category category = Optional
+                    .ofNullable(categoryRepository.findByName(addProductRequest.getCategory().getName()))
                     .orElseGet(() -> {
                         Category newCategory = new Category(addProductRequest.getCategory().getName());
                         return categoryRepository.save(newCategory);
@@ -49,7 +52,9 @@ public class ProductService implements IProductService {
         }
     }
 
-    private Product createProduct(AddProductRequest addProductRequest, Category category) {
+
+    private Product createProduct(AddProductRequest addProductRequest,
+                                  Category category) {
 
         return new Product(addProductRequest.getName(),
                 addProductRequest.getBrand(),
@@ -61,9 +66,9 @@ public class ProductService implements IProductService {
 
 
     @Override
-    public Product getProductById(Long id) {
-        return productRepository.findById(id).orElseThrow(() ->
-                new ProductNotFoundException("Product Not Found!"));
+    public ProductDto getProductById(Long id) {
+        return getConvertedProduct(productRepository.findById(id).orElseThrow(() ->
+                new ProductNotFoundException("Product Not Found!")));
     }
 
 
@@ -100,8 +105,8 @@ public class ProductService implements IProductService {
 
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductDto> getAllProducts() {
+        return getConvertedProducts(productRepository.findAll());
 
     }
 
@@ -188,14 +193,11 @@ public class ProductService implements IProductService {
     @Override
     public List<ProductDto> getConvertedProducts(List<Product> products) {
         return products.stream().map(this::converToDto).toList();
-
-
     }
 
     @Override
     public ProductDto getConvertedProduct(Product product) {
         return converToDto(product);
-
     }
 
 

@@ -21,7 +21,6 @@ public class Order {
     private Long orderId;
     private LocalDate orderDate;
     private BigDecimal totalAmount;
-
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 

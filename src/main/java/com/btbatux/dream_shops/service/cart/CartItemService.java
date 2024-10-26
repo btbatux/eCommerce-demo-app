@@ -1,5 +1,6 @@
 package com.btbatux.dream_shops.service.cart;
 
+import com.btbatux.dream_shops.dto.ProductDto;
 import com.btbatux.dream_shops.exception.ResourceNotFoundException;
 import com.btbatux.dream_shops.model.Cart;
 import com.btbatux.dream_shops.model.CartItem;
@@ -8,6 +9,7 @@ import com.btbatux.dream_shops.repository.CartItemRepository;
 import com.btbatux.dream_shops.repository.CartRepository;
 import com.btbatux.dream_shops.service.product.IProductService;
 import com.btbatux.dream_shops.service.product.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,15 +21,17 @@ public class CartItemService implements ICartItemService {
     private final ICartService cartService;
     private final ProductService productService;
     private final CartRepository cartRepository;
+    private final ModelMapper modelMapper;
 
     public CartItemService(CartItemRepository cartItemRepository,
                            CartService cartService,
                            ProductService productService,
-                           CartRepository cartRepository) {
+                           CartRepository cartRepository, ModelMapper modelMapper) {
         this.cartItemRepository = cartItemRepository;
         this.productService = productService;
         this.cartRepository = cartRepository;
         this.cartService = cartService;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -37,14 +41,14 @@ public class CartItemService implements ICartItemService {
         Cart cart = cartService.getCart(cartId);
 
         // 2. Ürünü al: Verilen productId'ye göre mevcut ürünü (Product) getirir.
-        Product product = productService.getProductById(productId);
+        ProductDto productDto = productService.getProductById(productId);
 
         // 3. Sepette aynı üründen daha önce eklenmiş mi kontrol et:
         // Eğer ürün zaten sepette varsa (CartItem) o ürünü alır, yoksa yeni bir CartItem oluşturur.
-        CartItem cartItem = cart.
-                getCartItems().stream()
+        CartItem cartItem = cart
+                .getCartItems().stream()
                 .filter(item ->
-                        item.getProduct().getId().equals(product.getId()))  // Sepette aynı ürünü arar.
+                        item.getProduct().getId().equals(productDto.getId()))  // Sepette aynı ürünü arar.
                 .findFirst()
                 .orElse(new CartItem()); // Eğer ürün bulunamazsa yeni bir CartItem oluşturur.
 
@@ -52,9 +56,9 @@ public class CartItemService implements ICartItemService {
         if (cartItem.getId() == null) {
             // CartItem'ın bilgilerini set et (cart, product, quantity, unitPrice).
             cartItem.setCart(cart); // Bu CartItem'ın ait olduğu sepeti set eder.
-            cartItem.setProduct(product); // Bu CartItem'ın ait olduğu ürünü set eder.
+            cartItem.setProduct(modelMapper.map(productDto, Product.class)); // Bu CartItem'ın ait olduğu ürünü set eder.
             cartItem.setQuantity(quantity); // Miktar olarak verilen değeri set eder.
-            cartItem.setUnitPrice(product.getPrice()); // Ürünün birim fiyatını set eder.
+            cartItem.setUnitPrice(productDto.getPrice()); // Ürünün birim fiyatını set eder.
         } else {
             // Eğer ürün daha önce sepete eklenmişse, miktarı artır.
             cartItem.setQuantity(cartItem.getQuantity() + quantity); // Mevcut miktara yeni miktarı ekler.

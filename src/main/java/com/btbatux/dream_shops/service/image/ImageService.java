@@ -1,6 +1,7 @@
 package com.btbatux.dream_shops.service.image;
 
 import com.btbatux.dream_shops.dto.ImageDto;
+import com.btbatux.dream_shops.dto.ProductDto;
 import com.btbatux.dream_shops.exception.ResourceNotFoundException;
 import com.btbatux.dream_shops.model.Image;
 import com.btbatux.dream_shops.model.Product;
@@ -8,6 +9,7 @@ import com.btbatux.dream_shops.repository.ImageRepository;
 import com.btbatux.dream_shops.service.product.IProductService;
 
 import com.btbatux.dream_shops.service.product.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,11 +25,13 @@ public class ImageService implements IImageSerice {
 
     private final ImageRepository imageRepository;
     private final ProductService productService;
+    private final ModelMapper modelMapper;
 
 
-    public ImageService(ImageRepository imageRepository, ProductService productService) {
+    public ImageService(ImageRepository imageRepository, ProductService productService, ModelMapper modelMapper) {
         this.imageRepository = imageRepository;
         this.productService = productService;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -46,7 +50,9 @@ public class ImageService implements IImageSerice {
 
     @Override
     public List<ImageDto> saveImages(List<MultipartFile> files, Long productId) {
-        Product product = productService.getProductById(productId);
+        ProductDto productDto = productService.getProductById(productId);
+
+
         List<ImageDto> savedImagesDto = new ArrayList<>();
 
         for (MultipartFile file : files) {
@@ -56,7 +62,7 @@ public class ImageService implements IImageSerice {
                 image.setFileName(file.getOriginalFilename());
                 image.setFileType(file.getContentType());
                 image.setImage(new SerialBlob(file.getBytes()));
-                image.setProduct(product);
+                image.setProduct(modelMapper.map(productDto,Product.class));
 
                 Image savedImage = imageRepository.save(image);
 
