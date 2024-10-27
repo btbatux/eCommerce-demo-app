@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "PRODUCT")
 public class Product {
 
     @Id
@@ -45,7 +46,6 @@ public class Product {
     //Product nesnesi üzerinde ne tür bir işlem yapılırsa yapılsın, aynı işlem onun Image nesneleri üzerinde de yapılır.
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images;
-
 
 
 }

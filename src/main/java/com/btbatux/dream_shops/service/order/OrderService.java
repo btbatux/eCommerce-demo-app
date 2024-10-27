@@ -31,7 +31,8 @@ public class OrderService implements IOrderService {
 
     public OrderService(OrderRepository orderRepository,
                         ProductRepository productRepository,
-                        CartService cartService, ModelMapper modelMapper) {
+                        CartService cartService,
+                        ModelMapper modelMapper) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.cartService = cartService;
@@ -44,7 +45,7 @@ public class OrderService implements IOrderService {
     public OrderDto getOrder(Long orderId) {
         return convertOrderDto
                 (orderRepository.findById(orderId).orElseThrow(()
-                -> new RuntimeException("No Order Found")));
+                        -> new RuntimeException("No Order Found")));
     }
 
 
@@ -109,7 +110,7 @@ public class OrderService implements IOrderService {
         return modelMapper.map(order, OrderDto.class);
     }
 
-    private List<OrderDto>convertOrderDtoList(List<Order> orderList) {
+    private List<OrderDto> convertOrderDtoList(List<Order> orderList) {
         return orderList.stream()
                 .map(order -> modelMapper.map(order, OrderDto.class))
                 .collect(Collectors.toList());

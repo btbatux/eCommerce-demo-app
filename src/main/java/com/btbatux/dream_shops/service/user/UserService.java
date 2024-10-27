@@ -8,7 +8,6 @@ import com.btbatux.dream_shops.repository.UserRepository;
 import com.btbatux.dream_shops.request.CreateUserRequest;
 import com.btbatux.dream_shops.request.UpdateUserRequest;
 import org.modelmapper.ModelMapper;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -36,11 +35,10 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(Long userId) {
-        try {
-            userRepository.deleteById(userId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new RuntimeException(e);
-        }
+            userRepository.findById(userId)
+                    .ifPresentOrElse(userRepository :: delete,()->{
+                throw new ResourceNotFoundException("User not found! " + userId);
+            });
     }
 
 
@@ -74,7 +72,8 @@ public class UserService implements IUserService {
                         new AlreadyExistsException("Oops " + request.getEmail() + " already exists"));
     }
 
-    private UserDto convertUserToUserDto(User user) {
+    @Override
+    public UserDto convertUserToUserDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }
 

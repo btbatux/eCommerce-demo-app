@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "ORDER_ITEM")
 public class OrderItem {
 
     @Id
@@ -24,7 +25,7 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "product_id")
     private Product product;
 
 

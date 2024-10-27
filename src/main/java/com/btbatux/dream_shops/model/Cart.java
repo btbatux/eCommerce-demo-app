@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "CART")
 public class Cart {
 
     @Id
@@ -27,6 +28,7 @@ public class Cart {
 
 
     @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
 

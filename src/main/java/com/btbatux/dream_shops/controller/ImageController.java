@@ -53,18 +53,13 @@ public class ImageController {
 
 
     @PutMapping("/image/{imageId}/update")
-    public ResponseEntity<ApiResponse> updateImage(@PathVariable Long imageId, @RequestParam MultipartFile file) {
+    public ResponseEntity<Void> updateImage(@PathVariable Long imageId,
+                                            @RequestParam MultipartFile file) {
         try {
             imageService.updateImage(file, imageId);
-            return ResponseEntity.ok(new ApiResponse
-                    ("Update Success", null));
+            return ResponseEntity.ok().build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            // Diğer hatalar için 500 (Internal Server Error) döndürülür.
-            return ResponseEntity.status
-                    (HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse
-                    ("Update Failed: " + e.getMessage(), null));
         }
     }
 

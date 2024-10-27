@@ -14,11 +14,12 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "ORDERS")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long id;
     private LocalDate orderDate;
     private BigDecimal totalAmount;
     @Enumerated(EnumType.STRING)

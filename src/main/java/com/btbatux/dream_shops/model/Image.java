@@ -13,6 +13,7 @@ import java.sql.Blob;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "IMAGE")
 public class Image {
 
     @Id
