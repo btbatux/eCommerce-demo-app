@@ -118,7 +118,7 @@ spring.servlet.multipart.max-request-size=5MB
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/dream-shops.git
+   git clone https://github.com/btbatux/dream-shops.git
 
 #### 🚀 API Endpoints
 
