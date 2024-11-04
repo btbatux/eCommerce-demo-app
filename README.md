@@ -10,6 +10,9 @@ It is built with a layered architecture that includes controllers, services, rep
 
 ### Project Structure
 
+![Weather API Uygulaması](eCommerce-diagram.png)
+
+
 The project follows a typical **Spring Boot** structure, organized for clarity and maintainability:
 
 - **Configuration**: Configuration files for app settings.
