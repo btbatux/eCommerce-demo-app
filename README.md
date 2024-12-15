@@ -1,4 +1,4 @@
-# 🛒 Dream Shops E-commerce Demo
+# 🛒 Btbatux Shops E-commerce Demo
 
 Welcome to **Dream Shops**, an e-commerce demo project built to showcase the structure and functionality of a robust online shopping platform using **Java Spring Boot**. 
 This project is designed to provide clear insights into various architectural layers and endpoints for easy navigation and development.
